@@ -1,33 +1,38 @@
 import streamlit as st
 from ultralytics import YOLO
-import cv2
+from PIL import Image
 import numpy as np
 
-# Load the YOLO model
-model = YOLO("yolov8n.pt")
+# Cargar el modelo YOLOv8
+@st.cache_resource
+def load_model():
+    return YOLO('yolov8n.pt')  # Usar 'yolov8n.pt' o el path a tu modelo personalizado
 
-# Streamlit app
-st.title("Object Detection with YOLO")
+model = load_model()
 
-# Camera input
-img_file_buffer = st.camera_input("Take a picture")
+st.title('Detector de Objetos con YOLOv8')
 
-if img_file_buffer is not None:
-    # Read image file buffer with OpenCV
-    bytes_data = img_file_buffer.getvalue()
-    cv2_img = cv2.imdecode(np.frombuffer(bytes_data, np.uint8), cv2.IMREAD_COLOR)
+uploaded_image = st.file_uploader("Elige una imagen...", type=["jpg", "jpeg", "png"])
 
-    # Perform YOLO prediction
-    results = model.predict(cv2_img, conf=0.5)
+if uploaded_image is not None:
+    image = Image.open(uploaded_image)
+    st.image(image, caption='Imagen subida.', use_column_width=True)
 
-    # Get bounding boxes
-    boxes = results[0].boxes.xyxy.tolist()
+    if st.button('Detectar Objetos'):
+        results = model(image)
+        
+        # Visualizar resultados
+        for r in results:
+            im_array = r.plot()  # plot a BGR numpy array of predictions
+            im = Image.fromarray(im_array[..., ::-1])  # RGB PIL image
+            st.image(im, caption='Resultado de la detección.', use_column_width=True)
 
-    # Plot results
-    res_plotted = results[0].plot()[:, :, ::-1]
+        # Mostrar resultados en formato de texto
+        for result in results:
+            boxes = result.boxes.data.tolist()
+            st.write("Objetos detectados:")
+            for box in boxes:
+                x1, y1, x2, y2, score, class_id = box
+                st.write(f"Clase: {result.names[int(class_id)]}, Confianza: {score:.2f}")
 
-    # Display the image with detections
-    st.image(res_plotted, caption='Object Detections', use_column_width=True)
-
-    # Display number of detections
-    st.write(f"Number of Detections: {len(boxes)}")
+st.write("Nota: Asegúrate de tener instaladas las bibliotecas necesarias (streamlit, ultralytics, pillow) y un modelo YOLOv8 en el mismo directorio que este script.")
