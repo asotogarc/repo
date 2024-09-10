@@ -2,7 +2,7 @@ import streamlit as st
 import sys
 import subprocess
 import pkg_resources
-
+from ultralytics import YOLO
 
 
 # Cargar el modelo YOLOv8
