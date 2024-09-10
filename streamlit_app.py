@@ -1,36 +1,21 @@
 import streamlit as st
-from PIL import Image
-import numpy as np
-import torch
-
-# Importing YOLO directly from torch hub to avoid OpenCV dependency
-model = torch.hub.load('ultralytics/yolov5', 'yolov5s', pretrained=True)
+from ultralytics.solutions import streamlit_inference as stui
 
 def main():
-    st.title("Detección de Objetos con YOLOv5")
-    
-    # Usar st.camera_input para capturar una imagen de la webcam
-    img_file_buffer = st.camera_input("Toma una foto")
-    
-    if img_file_buffer is not None:
-        # Convertir la imagen a un objeto PIL Image
-        image = Image.open(img_file_buffer)
-        
-        # Realizar la detección de objetos
-        results = model(image)
-        
-        # Obtener la imagen con las detecciones
-        img_with_boxes = Image.fromarray(results.render()[0])
-        
-        # Mostrar la imagen con las detecciones
-        st.image(img_with_boxes, caption="Imagen con Detecciones", use_column_width=True)
-        
-        # Mostrar las clases detectadas
-        detected_classes = results.pandas().xyxy[0]['name'].unique()
-        st.write("Objetos detectados:", ', '.join(detected_classes))
-    
-    else:
-        st.info("Esperando a que tomes una foto...")
+    st.title("Detección de Objetos en Tiempo Real con YOLOv8")
+    st.write("Esta aplicación utiliza YOLOv8 para detectar objetos en tiempo real desde tu cámara.")
+
+    # Configuración del modelo
+    model_path = "yolov8n.pt"  # Modelo YOLOv8 nano por defecto
+
+    # Llamada a la función de inferencia de Ultralytics
+    stui.inference(model=model_path)
+
+    st.write("Instrucciones:")
+    st.write("1. Haz clic en 'Start' para iniciar la detección en tiempo real.")
+    st.write("2. Permite el acceso a tu cámara cuando se te solicite.")
+    st.write("3. Ajusta los parámetros en el panel lateral si lo deseas.")
+    st.write("4. Haz clic en 'Stop' para detener la detección.")
 
 if __name__ == "__main__":
     main()
