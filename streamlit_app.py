@@ -15,7 +15,7 @@ if missing:
     st.warning(f"Instalando dependencias faltantes: {', '.join(missing)}")
     for package in missing:
         install(package)
-    st.experimental_rerun()
+    st.rerun()
 
 try:
     from ultralytics import YOLO
