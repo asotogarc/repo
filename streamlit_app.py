@@ -1,3 +1,5 @@
+import streamlit
+import ultralytics
 model = YOLO("yolov8n.pt")
 res = model.predict(file,conf=0.5,save=True)
 box = res[0].boxes.xyxy.tolist()
