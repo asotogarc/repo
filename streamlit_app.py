@@ -3,27 +3,7 @@ import sys
 import subprocess
 import pkg_resources
 
-def install(package):
-    subprocess.check_call([sys.executable, "-m", "pip", "install", package])
 
-# Verificar y instalar dependencias
-required = {'ultralytics', 'Pillow'}
-installed = {pkg.key for pkg in pkg_resources.working_set}
-missing = required - installed
-
-if missing:
-    st.warning(f"Instalando dependencias faltantes: {', '.join(missing)}")
-    for package in missing:
-        install(package)
-    st.rerun()
-
-try:
-    from ultralytics import YOLO
-    from PIL import Image
-except ImportError as e:
-    st.error(f"Error al importar las bibliotecas necesarias: {e}")
-    st.info("Por favor, asegúrate de que todas las dependencias estén instaladas correctamente.")
-    st.stop()
 
 # Cargar el modelo YOLOv8
 @st.cache_resource
