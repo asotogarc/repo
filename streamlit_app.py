@@ -1,6 +1,5 @@
 import streamlit as st
 from ultralytics import YOLO
-import cv2
 
 model = YOLO("yolov8n.pt")
 res = model.predict(file,conf=0.5,save=True)
