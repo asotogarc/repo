@@ -1,52 +1,18 @@
 import streamlit as st
-import sys
-import subprocess
-import pkg_resources
-from ultralytics import YOLO
 
+def main():
+    st.title("Webcam Photo Capture")
+    
+    # Use st.camera_input to capture an image from the webcam
+    img_file_buffer = st.camera_input("Take a picture")
+    
+    # Check if a photo was taken
+    if img_file_buffer is not None:
+        # Display the captured image
+        st.image(img_file_buffer, caption="Captured Image")
+        st.success("Photo captured successfully!")
+    else:
+        st.info("Waiting for you to take a photo...")
 
-# Cargar el modelo YOLOv8
-@st.cache_resource
-def load_model():
-    try:
-        return YOLO('yolov8n.pt')  # Usar 'yolov8n.pt' o el path a tu modelo personalizado
-    except Exception as e:
-        st.error(f"Error al cargar el modelo YOLOv8: {e}")
-        return None
-
-model = load_model()
-
-if model is None:
-    st.error("No se pudo cargar el modelo. Por favor, verifica la instalación y la ruta del modelo.")
-    st.stop()
-
-st.title('Detector de Objetos con YOLOv8')
-
-# Usar st.camera_input en lugar de st.file_uploader
-img_file_buffer = st.camera_input("Toma una foto")
-
-if img_file_buffer is not None:
-    try:
-        image = Image.open(img_file_buffer)
-        st.image(image, caption='Imagen capturada.', use_column_width=True)
-
-        if st.button('Detectar Objetos'):
-            results = model(image)
-            
-            # Visualizar resultados
-            for r in results:
-                im_array = r.plot()  # plot a BGR numpy array of predictions
-                im = Image.fromarray(im_array[..., ::-1])  # RGB PIL image
-                st.image(im, caption='Resultado de la detección.', use_column_width=True)
-
-            # Mostrar resultados en formato de texto
-            for result in results:
-                boxes = result.boxes.data.tolist()
-                st.write("Objetos detectados:")
-                for box in boxes:
-                    x1, y1, x2, y2, score, class_id = box
-                    st.write(f"Clase: {result.names[int(class_id)]}, Confianza: {score:.2f}")
-    except Exception as e:
-        st.error(f"Error al procesar la imagen: {e}")
-
-st.write("Nota: Si encuentras problemas, asegúrate de que todas las dependencias estén instaladas y que el modelo YOLOv8 esté en el directorio correcto.")
+if __name__ == "__main__":
+    main()
