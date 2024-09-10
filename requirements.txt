@@ -1,3 +1,4 @@
 streamlit
 ultralytics
-cv2
+opencv-contrib-python
+
