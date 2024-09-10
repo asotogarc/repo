@@ -1,3 +1,2 @@
 streamlit
 ultralytics
-streamlit_option_menu
